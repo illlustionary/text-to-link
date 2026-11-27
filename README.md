@@ -171,7 +171,7 @@
 
 ## 开发
 
-环境要求：Node.js ≥ 18
+环境要求：Node.js ≥ 22.22（推荐 24 LTS，`jsdom` 31 需要）
 
 ```bash
 npm install
@@ -217,7 +217,7 @@ dist/
 
 推送到 `master` 后，GitHub Actions 会：
 
-1. 安装 Node 20 并缓存 npm 依赖
+1. 安装 Node 24 并缓存 npm 依赖
 2. `npm ci && npm test`
 3. `npm run build`，用 `github.run_number` 生成 `@version`
 4. 产物有变化时自动提交回 `master`（提交信息带 `[skip ci]`，不会循环触发）
