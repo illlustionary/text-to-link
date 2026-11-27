@@ -1,0 +1,37 @@
+/**
+ * 仅保留 toast 这类必须挂在页面上的全局样式。
+ * 设置框样式全部位于 Shadow DOM 内，避免污染宿主页面。
+ */
+
+.t2l-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 48px;
+  z-index: 2147483647;
+  max-width: min(80vw, 420px);
+  padding: 10px 16px;
+  color: #ffffff;
+  background: rgba(20, 20, 22, 0.92);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  word-break: break-word;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.t2l-toast--show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t2l-toast {
+    transition: none;
+  }
+}

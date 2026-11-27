@@ -1,0 +1,60 @@
+version: "1.0"
+name: build-userscript
+displayName: 构建油猴脚本
+stages:
+- name: 构建
+  displayName: 构建
+  strategy: naturally
+  trigger: auto
+  executor: []
+  steps:
+  - step: build@gcc
+    name: build_userscript
+    displayName: 构建 dist/script.user.js
+    gccVersion: "9.4"
+    commands:
+    - set -e
+    - "# 自动构建提交不再重复触发构建"
+    - "if echo \"${GITEE_COMMIT_MESSAGE}\" | grep -q \"\\[skip ci\\]\"; then echo\
+      \ \"本次为自动构建提交，跳过\"; exit 0; fi"
+    - "# Gitee Go 自带 Node 最高 15.x，而 esbuild 需要 >= 18，这里自备一个 Node 20"
+    - "if [ ! -x \"$HOME/.local/node20/bin/node\" ]; then mkdir -p \"$HOME/.local/node20\"\
+      \ && wget -q \"https://registry.npmmirror.com/-/binary/node/v20.19.0/node-v20.19.0-linux-x64.tar.gz\"\
+      \ -O /tmp/node.tar.gz && tar -xzf /tmp/node.tar.gz -C \"$HOME/.local/node20\"\
+      \ --strip-components=1; fi"
+    - export PATH="$HOME/.local/node20/bin:$PATH" && node -v && npm -v
+    - export PATH="$HOME/.local/node20/bin:$PATH" && npm ci --no-audit --no-fund
+    - "export PATH=\"$HOME/.local/node20/bin:$PATH\" && BUILD_NUMBER=\"${GITEE_PIPELINE_BUILD_NUMBER}\"\
+      \ npm run build"
+    - "# 产物有变化才回推，避免无意义的空提交"
+    - git config user.name "gitee-go"
+    - git config user.email "13063369+neko_nya@user.noreply.gitee.com"
+    - git add dist/script.user.js
+    - if git diff --cached --quiet; then echo "dist/script.user.js 无变化，跳过提交"; exit
+      0; fi
+    - "if [ -z \"${REPO_PUSH_TOKEN}\" ]; then echo \"缺少全局参数 REPO_PUSH_TOKEN（Gitee\
+      \ 私人令牌，需勾选 projects 权限），无法回推产物\"; exit 1; fi"
+    - "git commit -m \"chore(build): 自动构建 dist/script.user.js [skip ci]\""
+    - "git push \"https://oauth2:${REPO_PUSH_TOKEN}@gitee.com/neko_nya/text-to-link.git\"\
+      \ HEAD:master"
+    artifacts:
+    - name: BUILD_ARTIFACT
+      path:
+      - ./dist
+      type: .tar.gz
+    caches:
+    - "~/.npm"
+    - "~/.local/node20"
+triggers:
+  trigger: auto
+  push:
+    branches:
+      prefix: []
+      precise:
+      - master
+      include: []
+notify: []
+strategy:
+  blocking: true
+ref_variable:
+- REPO_PUSH_TOKEN

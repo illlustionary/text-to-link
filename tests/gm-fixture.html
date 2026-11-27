@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>GM 菜单测试页</title>
+    <style>
+      body {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 20px;
+        font: 15px/1.7 system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>GM 菜单测试页</h1>
+    <p id="text">测试 https://example.com 和 baidu.com</p>
+
+    <script>
+      // 模拟 ScriptCat / Tampermonkey 的同步 GM API
+      window.__store = {}
+      window.__menus = []
+      window.GM_getValue = function (key, fallback) {
+        return Object.prototype.hasOwnProperty.call(window.__store, key)
+          ? window.__store[key]
+          : fallback
+      }
+      window.GM_setValue = function (key, value) {
+        window.__store[key] = value
+      }
+      window.GM_registerMenuCommand = function (text, onClick) {
+        var id = window.__menus.length + 1
+        window.__menus.push({ id: id, text: text, onClick: onClick })
+        return id
+      }
+      window.GM_unregisterMenuCommand = function (id) {
+        window.__menus = window.__menus.filter(function (item) {
+          return item.id !== id
+        })
+      }
+    </script>
+    <script src="../dist/script.user.js"></script>
+  </body>
+</html>

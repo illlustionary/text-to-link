@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>文本转链接测试页</title>
+    <style>
+      body {
+        max-width: 760px;
+        margin: 40px auto;
+        padding: 0 20px;
+        font: 15px/1.7 system-ui, sans-serif;
+      }
+      code {
+        padding: 2px 5px;
+        background: #f2f4f7;
+        border-radius: 4px;
+      }
+      a.t2l-link {
+        color: #2563eb;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>文本转链接测试页</h1>
+
+    <p id="basic">访问 https://example.com 和 baidu.com 看看。</p>
+    <p id="punct">（example.com/path?q=1）</p>
+    <p id="code">代码：<code>index.js</code> 不应转换</p>
+    <p id="email">邮箱：user@example.com 不应转换</p>
+    <p id="version">版本号 1.2.3 不应转换</p>
+    <p id="ip">局域网 192.168.1.1:8080</p>
+    <p id="old"><a href="https://old.com">https://old.com</a></p>
+    <p id="zip">压缩包 archive.zip 不转，但 archive.zip/file 要转</p>
+
+    <div id="dynamic"></div>
+
+    <script src="../dist/script.user.js"></script>
+    <script>
+      window.setTimeout(function () {
+        var p = document.createElement('p')
+        p.id = 'dynamic-p'
+        p.textContent = '动态插入 github.com 和 https://dynamic.dev/x'
+        document.getElementById('dynamic').appendChild(p)
+      }, 600)
+    </script>
+  </body>
+</html>
