@@ -15,6 +15,7 @@
     "scriptcat",
     "text-to-link"
   ],
+  "author": "illlustionary",
   "license": "AGPL-3.0",
   "devDependencies": {
     "esbuild": "^0.28.2",

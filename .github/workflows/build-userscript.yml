@@ -1,0 +1,49 @@
+name: build-userscript
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-userscript
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 运行测试
+        run: npm test
+
+      - name: 构建脚本
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: npm run build
+
+      - name: 回推构建产物
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/script.user.js
+          if git diff --cached --quiet; then
+            echo "dist/script.user.js 无变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "chore(build): 自动构建 dist/script.user.js [skip ci]"
+          git push

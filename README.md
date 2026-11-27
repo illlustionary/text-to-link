@@ -14,14 +14,14 @@
 - **打开方式**：新标签页 / 当前页，自动转换与手动转换统一生效
 - **站点黑名单**：某些站点不想被改动，可整站排除
 - **无悬浮按钮**：不往页面里塞常驻 UI，所有配置都在 ScriptCat 菜单里，点开设置面板修改
-- **自动更新**：内置 Gitee `@updateURL` / `@downloadURL`，版本变化后 ScriptCat 自动检查更新
+- **自动更新**：内置 GitHub `@updateURL` / `@downloadURL`，版本变化后 ScriptCat 自动检查更新
 
 ## 安装
 
 1. 安装用户脚本管理器：[ScriptCat](https://scriptcat.org/)（推荐）或 Tampermonkey
 2. 打开安装地址：
 
-   <https://gitee.com/neko_nya/text-to-link/raw/master/dist/script.user.js>
+   <https://raw.githubusercontent.com/illlustionary/text-to-link/master/dist/script.user.js>
 
 3. 在管理器中确认安装
 
@@ -167,7 +167,7 @@
 
 **自动更新没反应？**
 
-脚本版本号由 CI 自动递增（`主版本.次版本.修订号.构建号`）。确认管理器开启了自动更新，并且能访问 Gitee raw 地址。
+脚本版本号由 CI 自动递增（`主版本.次版本.修订号.构建号`）。确认管理器开启了自动更新，并且能访问 GitHub raw 地址。
 
 ## 开发
 
@@ -207,22 +207,22 @@ tests/
   integration.test.mjs 自动扫描集成测试
   fixture.html         自动转换手动测试页
   gm-fixture.html      GM 菜单 / 设置面板手动测试页
-.workflow/
-  build-userscript.yml   Gitee Go 流水线
+.github/workflows/
+  build-userscript.yml   GitHub Actions 流水线
 dist/
   script.user.js         构建产物（由 CI 自动回推）
 ```
 
 ### 自动构建
 
-推送到 `master` 后，Gitee Go 会：
+推送到 `master` 后，GitHub Actions 会：
 
-1. 安装 Node 20（Gitee Go 内置版本过低，esbuild 需要 ≥ 18）
-2. `npm ci && npm run build`
-3. 用 `BUILD_NUMBER` 生成 `@version`
+1. 安装 Node 20 并缓存 npm 依赖
+2. `npm ci && npm test`
+3. `npm run build`，用 `github.run_number` 生成 `@version`
 4. 产物有变化时自动提交回 `master`（提交信息带 `[skip ci]`，不会循环触发）
 
-流水线需要仓库的通用变量 `REPO_PUSH_TOKEN`（Gitee 私人令牌，勾选 `projects` 权限），并在流水线中关联。
+流水线使用仓库自带的 `GITHUB_TOKEN`，只需在 workflow 里声明 `permissions: contents: write`，不需要额外配置令牌。
 
 ## 贡献
 
